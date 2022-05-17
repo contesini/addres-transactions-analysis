@@ -37,7 +37,7 @@ const saveJson = (data, fileName) => {
 
 const main = async () => {
     // get transactions history 
-    await client.getTransactionsHistory(6702068, 14794437, "0xA0b73E1Ff0B80914AB6fe0444E65848C4C34450b")
+    await client.getTransactionsHistory(process.env.START_BLOCK, process.env.ENV_BLOCK, "0xA0b73E1Ff0B80914AB6fe0444E65848C4C34450b")
 }
 
 
