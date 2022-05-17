@@ -1,5 +1,6 @@
 require('dotenv').config()
 const client = require('./client/index')
+const saveToSheets = require('./google-sheets/index')
 
 const orderByTransactionsCount = (transactionsByFromAndTo) => {
     const result = []
@@ -36,10 +37,9 @@ const saveJson = (data, fileName) => {
 
 const main = async () => {
     // get transactions history 
-    const transactions = await client.getTransactionsHistory()
-    const transactionsByFromAndTo = groupByFromAndTo(transactions)
-    saveJson(transactionsByFromAndTo, 'transactionsByFromAndTo.json')
+    await client.getTransactionsHistory(6702068, 14794437, "0xA0b73E1Ff0B80914AB6fe0444E65848C4C34450b")
 }
+
 
 main()
 
