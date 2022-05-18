@@ -1,6 +1,5 @@
 require('dotenv').config()
 const client = require('./client/index')
-const saveToSheets = require('./google-sheets/index')
 
 const orderByTransactionsCount = (transactionsByFromAndTo) => {
     const result = []
@@ -21,23 +20,27 @@ const groupByFromAndTo = (transactions) => {
 
         } else {
             result[`${transaction.from}-${transaction.to}`]['transactions'].push(transaction)
-            result[`${transaction.from}-${transaction.to}`]['transactionsBetweenCount'] += 1 
+            result[`${transaction.from}-${transaction.to}`]['transactionsBetweenCount'] += 1
         }
     })
     return orderByTransactionsCount(result)
 }
 
-const saveJson = (data, fileName) => {
+const readLastBlock = () => {
     const fs = require('fs')
-    fs.writeFile(fileName, JSON.stringify(data), (err) => {
-        if (err) throw err
-        console.log('The file has been saved!')
-    })
+    const path = require('path')
+    const filePath = path.join(__dirname, '../lastBlock.json')
+    const data = fs.readFileSync(filePath)
+    return JSON.parse(data)
 }
+
 
 const main = async () => {
     // get transactions history 
-    await client.getTransactionsHistory(process.env.START_BLOCK, process.env.ENV_BLOCK, "0xA0b73E1Ff0B80914AB6fe0444E65848C4C34450b")
+    const lastBlock  = readLastBlock()
+    if(lastBlock) console.log(`lastBlock: ${lastBlock.lastBlockNumber}`)
+
+    await client.getTransactionsHistory( Number(process.env.START_BLOCK) || lastBlock.lastBlockNumber, Number(process.env.ENV_BLOCK) || 999999999, "0xA0b73E1Ff0B80914AB6fe0444E65848C4C34450b")
 }
 
 

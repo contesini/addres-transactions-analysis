@@ -39,6 +39,7 @@ const mapObjectValuesToArrayOfString = (transactions) => {
   return result
 }
 
+
 const testSaveToSheets = async () => {
   const transactions = mapObjectValuesToArrayOfString(require('../../transactions.json'))
   await saveToSheets(transactions)

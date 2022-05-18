@@ -1,3 +1,4 @@
+const fs = require('fs')
 const axios = require('axios');
 const { saveToSheets } = require('../google-sheets');
 
@@ -15,10 +16,13 @@ const mapArray = (arrayOfArrays) => {
     return result
 }
 
+const saveJsonAsync = async (data, fileName) => fs.writeFileSync(fileName, JSON.stringify(data), { encoding: 'utf8', flag: 'w' })
+
+
 // create getTransactionsHistory function
 const getTransactionsHistory = async (startBlock = 0, endBlock = 1, nftCollectionAddress = "0xA0b73E1Ff0B80914AB6fe0444E65848C4C34450b") => {
-    const numberOffLoops = endBlock - startBlock;
-    for (let index = 0; index < numberOffLoops; index += 5) {
+    const numberOfLoops = endBlock - startBlock;
+    for (let index = 0; index < numberOfLoops; index += 5) {
         try {
             const transactionsProm = axios.get(`${process.env.API_URL}?${TRANSACTIONS_PATH((startBlock + index), (startBlock + index + 1), nftCollectionAddress)}`)
             const transactionsProm1 = axios.get(`${process.env.API_URL}?${TRANSACTIONS_PATH((startBlock + index + 1), (startBlock + index + 2), nftCollectionAddress)}`)
@@ -34,10 +38,12 @@ const getTransactionsHistory = async (startBlock = 0, endBlock = 1, nftCollectio
                 transactionsProm4
             ]).then(mapArray)
 
+            const lastBlock = (startBlock + index + 4)
+            saveJsonAsync({ lastBlock: lastBlock }, `../../lastBlock.json`)
             await sleep(1000)
-            console.log(`block: ${startBlock + index + 5}`)
-            if(transactions.length) await saveToSheets(transactions)
 
+            console.log(`block: ${lastBlock}`)
+            if (transactions.length) await saveToSheets(transactions)
         } catch (error) {
             console.error(error)
         }
